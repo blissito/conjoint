@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FresnyJoints - Estudio de Preferencias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .intro {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .progress {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .scenario {
+            display: none;
+        }
+
+        .scenario.active {
+            display: block;
+        }
+
+        .scenario-number {
+            color: #667eea;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 0;
+            margin-bottom: 20px;
+            border: 3px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .product-details {
+            padding: 30px;
+        }
+
+        .attribute {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .attribute:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .attribute-name {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .attribute-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .rating-section {
+            margin-top: 25px;
+        }
+
+        .rating-label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .rating-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .rating-btn {
+            flex: 1;
+            min-width: 60px;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .rating-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .rating-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .result-bar-container {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .result-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        .attribute-results {
+            margin-top: 30px;
+        }
+
+        .attribute-result {
+            margin-bottom: 25px;
+        }
+
+        .attribute-result h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .level-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .level-name {
+            flex: 1;
+            color: #666;
+        }
+
+        .level-bar-container {
+            flex: 2;
+            background: #f0f0f0;
+            height: 25px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .level-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 1s ease;
+        }
+
+        .level-value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .brand-info {
+            flex: 1;
+        }
+
+        .brand-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .brand-tagline {
+            color: #999;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand-header">
+            <div class="logo">FC</div>
+            <div class="brand-info">
+                <div class="brand-name">FresnyConjoint</div>
+                <div class="brand-tagline">Análisis de Preferencias Inteligente</div>
+            </div>
+        </div>
+
+        <h1>Estudio de Preferencias - Smartphones</h1>
+        <p class="intro">
+            A continuación verás diferentes opciones de smartphones.
+            Califica cada una según tu nivel de interés en comprarla (1 = nada interesado, 5 = muy interesado).
+        </p>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="scenarios"></div>
+
+        <div class="results" id="results">
+            <h2 style="margin-bottom: 20px;">Resultados del Análisis</h2>
+
+            <h3 style="margin-bottom: 15px; color: #667eea;">Importancia Relativa de Atributos</h3>
+            <div id="importanceResults"></div>
+
+            <div class="attribute-results" id="utilityResults"></div>
+
+            <button class="export-btn" onclick="exportToCSV()">
+                <span>📊</span>
+                <span>Exportar Resultados a CSV</span>
+            </button>
+            <button class="restart-btn" onclick="restartSurvey()">Reiniciar Estudio</button>
+        </div>
+    </div>
+
+    <script>
+        // Definición de atributos y niveles
+        const attributes = {
+            precio: ['$299', '$499', '$799'],
+            pantalla: ['5.5"', '6.1"', '6.7"'],
+            camara: ['12MP', '48MP', '108MP'],
+            bateria: ['3000mAh', '4000mAh', '5000mAh']
+        };
+
+        // Generar escenarios (diseño factorial completo simplificado)
+        function generateScenarios() {
+            const scenarios = [];
+            // Generamos 12 escenarios balanceados con imágenes de Pexels
+            const designs = [
+                { precio: '$299', pantalla: '5.5"', camara: '12MP', bateria: '3000mAh', imagen: 'https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$299', pantalla: '6.1"', camara: '48MP', bateria: '4000mAh', imagen: 'https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$299', pantalla: '6.7"', camara: '108MP', bateria: '5000mAh', imagen: 'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$499', pantalla: '5.5"', camara: '48MP', bateria: '5000mAh', imagen: 'https://images.pexels.com/photos/1092671/pexels-photo-1092671.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$499', pantalla: '6.1"', camara: '108MP', bateria: '3000mAh', imagen: 'https://images.pexels.com/photos/1449791/pexels-photo-1449791.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$499', pantalla: '6.7"', camara: '12MP', bateria: '4000mAh', imagen: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$799', pantalla: '5.5"', camara: '108MP', bateria: '4000mAh', imagen: 'https://images.pexels.com/photos/3999944/pexels-photo-3999944.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$799', pantalla: '6.1"', camara: '12MP', bateria: '5000mAh', imagen: 'https://images.pexels.com/photos/1294515/pexels-photo-1294515.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$799', pantalla: '6.7"', camara: '48MP', bateria: '3000mAh', imagen: 'https://images.pexels.com/photos/4549414/pexels-photo-4549414.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$499', pantalla: '6.1"', camara: '48MP', bateria: '4000mAh', imagen: 'https://images.pexels.com/photos/3999685/pexels-photo-3999685.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$299', pantalla: '6.7"', camara: '48MP', bateria: '5000mAh', imagen: 'https://images.pexels.com/photos/4505463/pexels-photo-4505463.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { precio: '$799', pantalla: '6.1"', camara: '108MP', bateria: '5000mAh', imagen: 'https://images.pexels.com/photos/5081914/pexels-photo-5081914.jpeg?auto=compress&cs=tinysrgb&w=600' }
+            ];
+
+            return designs;
+        }
+
+        const scenarios = generateScenarios();
+        let currentScenario = 0;
+        let ratings = [];
+        let globalImportance = {};
+        let globalUtilities = {};
+
+        // Renderizar escenarios
+        function renderScenarios() {
+            const container = document.getElementById('scenarios');
+
+            scenarios.forEach((scenario, index) => {
+                const scenarioDiv = document.createElement('div');
+                scenarioDiv.className = 'scenario' + (index === 0 ? ' active' : '');
+                scenarioDiv.innerHTML = `
+                    <div class="scenario-number">Opción ${index + 1} de ${scenarios.length}</div>
+                    <div class="product-card">
+                        <img src="${scenario.imagen}" alt="Smartphone ${index + 1}" class="product-image" loading="lazy">
+                        <div class="product-details">
+                            <div class="attribute">
+                                <span class="attribute-name">💰 Precio</span>
+                                <span class="attribute-value">${scenario.precio}</span>
+                            </div>
+                            <div class="attribute">
+                                <span class="attribute-name">📱 Tamaño de Pantalla</span>
+                                <span class="attribute-value">${scenario.pantalla}</span>
+                            </div>
+                            <div class="attribute">
+                                <span class="attribute-name">📷 Cámara</span>
+                                <span class="attribute-value">${scenario.camara}</span>
+                            </div>
+                            <div class="attribute">
+                                <span class="attribute-name">🔋 Batería</span>
+                                <span class="attribute-value">${scenario.bateria}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rating-section">
+                        <label class="rating-label">¿Qué tan interesado estarías en comprar este smartphone?</label>
+                        <div class="rating-options">
+                            <button class="rating-btn" onclick="selectRating(${index}, 1)">1<br>Nada</button>
+                            <button class="rating-btn" onclick="selectRating(${index}, 2)">2<br>Poco</button>
+                            <button class="rating-btn" onclick="selectRating(${index}, 3)">3<br>Neutral</button>
+                            <button class="rating-btn" onclick="selectRating(${index}, 4)">4<br>Bastante</button>
+                            <button class="rating-btn" onclick="selectRating(${index}, 5)">5<br>Mucho</button>
+                        </div>
+                    </div>
+
+                    <button class="next-btn" id="nextBtn${index}" onclick="nextScenario()" disabled>
+                        ${index === scenarios.length - 1 ? 'Ver Resultados' : 'Siguiente'}
+                    </button>
+                `;
+                container.appendChild(scenarioDiv);
+            });
+        }
+
+        function selectRating(scenarioIndex, rating) {
+            ratings[scenarioIndex] = rating;
+
+            // Actualizar UI
+            const scenario = document.querySelectorAll('.scenario')[scenarioIndex];
+            const buttons = scenario.querySelectorAll('.rating-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx + 1 === rating) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+
+            // Habilitar botón siguiente
+            document.getElementById(`nextBtn${scenarioIndex}`).disabled = false;
+        }
+
+        function nextScenario() {
+            const scenarioElements = document.querySelectorAll('.scenario');
+            scenarioElements[currentScenario].classList.remove('active');
+
+            currentScenario++;
+
+            // Actualizar barra de progreso
+            const progress = (currentScenario / scenarios.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            if (currentScenario < scenarios.length) {
+                scenarioElements[currentScenario].classList.add('active');
+            } else {
+                // Mostrar resultados
+                calculateAndShowResults();
+            }
+        }
+
+        function calculateAndShowResults() {
+            // Calcular utilidades usando regresión simple
+            const utilities = {};
+
+            // Inicializar utilidades
+            for (let attr in attributes) {
+                utilities[attr] = {};
+                attributes[attr].forEach(level => {
+                    utilities[attr][level] = 0;
+                });
+            }
+
+            // Calcular utilidad promedio por nivel
+            const counts = JSON.parse(JSON.stringify(utilities));
+
+            scenarios.forEach((scenario, idx) => {
+                const rating = ratings[idx];
+                for (let attr in scenario) {
+                    // Ignorar la propiedad 'imagen'
+                    if (attr === 'imagen') continue;
+
+                    const level = scenario[attr];
+                    utilities[attr][level] += rating;
+                    counts[attr][level]++;
+                }
+            });
+
+            // Promediar
+            for (let attr in utilities) {
+                for (let level in utilities[attr]) {
+                    if (counts[attr][level] > 0) {
+                        utilities[attr][level] /= counts[attr][level];
+                    }
+                }
+            }
+
+            // Calcular importancia relativa
+            const ranges = {};
+            let totalRange = 0;
+
+            for (let attr in utilities) {
+                const values = Object.values(utilities[attr]);
+                const range = Math.max(...values) - Math.min(...values);
+                ranges[attr] = range;
+                totalRange += range;
+            }
+
+            const importance = {};
+            for (let attr in ranges) {
+                importance[attr] = (ranges[attr] / totalRange) * 100;
+            }
+
+            // Mostrar resultados
+            displayResults(importance, utilities);
+        }
+
+        function displayResults(importance, utilities) {
+            // Guardar resultados globalmente para exportación
+            globalImportance = importance;
+            globalUtilities = utilities;
+
+            // Ocultar escenarios
+            document.getElementById('scenarios').style.display = 'none';
+            document.querySelector('.progress').style.display = 'none';
+
+            // Mostrar resultados
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.add('active');
+
+            // Importancia relativa
+            const importanceDiv = document.getElementById('importanceResults');
+            const attrNames = {
+                precio: 'Precio',
+                pantalla: 'Tamaño de Pantalla',
+                camara: 'Cámara',
+                bateria: 'Batería'
+            };
+
+            const sortedImportance = Object.entries(importance).sort((a, b) => b[1] - a[1]);
+
+            sortedImportance.forEach(([attr, value]) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                itemDiv.innerHTML = `
+                    <div class="result-title">${attrNames[attr]}</div>
+                    <div class="result-bar-container">
+                        <div class="result-bar" style="width: ${value}%">${value.toFixed(1)}%</div>
+                    </div>
+                `;
+                importanceDiv.appendChild(itemDiv);
+            });
+
+            // Utilidades por nivel
+            const utilityDiv = document.getElementById('utilityResults');
+            utilityDiv.innerHTML = '<h3 style="margin-bottom: 15px; color: #667eea;">Preferencia por Nivel de Atributo</h3>';
+
+            for (let attr in utilities) {
+                const attrDiv = document.createElement('div');
+                attrDiv.className = 'attribute-result';
+
+                let levelsHTML = '';
+                const values = Object.values(utilities[attr]);
+                const maxValue = Math.max(...values);
+
+                for (let level in utilities[attr]) {
+                    const utility = utilities[attr][level];
+                    const percentage = (utility / maxValue) * 100;
+
+                    levelsHTML += `
+                        <div class="level-result">
+                            <div class="level-name">${level}</div>
+                            <div class="level-bar-container">
+                                <div class="level-bar" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="level-value">${utility.toFixed(2)}</div>
+                        </div>
+                    `;
+                }
+
+                attrDiv.innerHTML = `
+                    <h3>${attrNames[attr]}</h3>
+                    ${levelsHTML}
+                `;
+
+                utilityDiv.appendChild(attrDiv);
+            }
+        }
+
+        function exportToCSV() {
+            const attrNames = {
+                precio: 'Precio',
+                pantalla: 'Tamaño de Pantalla',
+                camara: 'Cámara',
+                bateria: 'Batería'
+            };
+
+            let csvContent = '';
+
+            // Encabezado del estudio
+            csvContent += 'FRESNYCONJOINT - Análisis de Preferencias\n';
+            csvContent += 'Fecha,' + new Date().toLocaleDateString() + '\n';
+            csvContent += '\n';
+
+            // Sección 1: Escenarios evaluados
+            csvContent += 'ESCENARIOS EVALUADOS\n';
+            csvContent += 'Escenario,Precio,Pantalla,Cámara,Batería,Calificación\n';
+
+            scenarios.forEach((scenario, idx) => {
+                csvContent += `${idx + 1},${scenario.precio},${scenario.pantalla},${scenario.camara},${scenario.bateria},${ratings[idx]}\n`;
+            });
+
+            csvContent += '\n\n';
+
+            // Sección 2: Importancia Relativa
+            csvContent += 'IMPORTANCIA RELATIVA DE ATRIBUTOS\n';
+            csvContent += 'Atributo,Importancia (%)\n';
+
+            const sortedImportance = Object.entries(globalImportance).sort((a, b) => b[1] - a[1]);
+            sortedImportance.forEach(([attr, value]) => {
+                csvContent += `${attrNames[attr]},${value.toFixed(2)}\n`;
+            });
+
+            csvContent += '\n\n';
+
+            // Sección 3: Utilidades por Nivel
+            csvContent += 'UTILIDADES POR NIVEL DE ATRIBUTO\n';
+            csvContent += 'Atributo,Nivel,Utilidad\n';
+
+            for (let attr in globalUtilities) {
+                for (let level in globalUtilities[attr]) {
+                    const utility = globalUtilities[attr][level];
+                    csvContent += `${attrNames[attr]},${level},${utility.toFixed(3)}\n`;
+                }
+            }
+
+            // Crear y descargar archivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            const timestamp = new Date().toISOString().slice(0,10);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `FresnyConjoint_Resultados_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function restartSurvey() {
+            currentScenario = 0;
+            ratings = [];
+
+            document.getElementById('scenarios').style.display = 'block';
+            document.querySelector('.progress').style.display = 'block';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('results').classList.remove('active');
+
+            // Limpiar contenido
+            document.getElementById('scenarios').innerHTML = '';
+            document.getElementById('importanceResults').innerHTML = '';
+            document.getElementById('utilityResults').innerHTML = '';
+
+            // Re-renderizar
+            renderScenarios();
+        }
+
+        // Inicializar
+        renderScenarios();
+    </script>
+</body>
+</html>
